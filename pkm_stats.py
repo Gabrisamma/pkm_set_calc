@@ -39,7 +39,7 @@ def get_most_used():
     soup = open_request(pikalytics_url)
     pokemon_data = soup.find(id='min_list')
     names = []
-    for pokemon in pokemon_data.findChildren('a', limit=1):
+    for pokemon in pokemon_data.findChildren('a', limit=2):
         names.append(pokemon.get('data-name').lower())
     return names
 

@@ -1,5 +1,6 @@
 import requests
 import json
+import math
 from pkm_stats import pokeapi_url
 
 
@@ -43,17 +44,18 @@ def is_burned(burn):
 
 
 def damage_calc(level, attacker, defender, move, targets, critical, burn):
+    
     if move['power'] == 0:
         return 0, 0
 
     attack = '' if move['damage_class'] else 'special-'
 
-    max_damage = ((2 * level / 5) * move['power'] * attacker['new_stats'][attack + 'attack'] / defender['new_stats'][attack + 'defense'] / 50 + 2)
+    max_damage = ((2 * level / 5) * move['power'] * float(attacker['new_stats'][attack + 'attack'].get()) / defender['new_stats'][attack + 'defense'] / 50 + 2)
     max_damage *= damage_split_targets(targets) * is_critical(critical) * is_STAB(move['type'], attacker['type']) * type_effectiveness(move['type'], defender['type']) * is_burned(burn)
 
     min_damage = max_damage * 0.85
 
-    return min_damage, max_damage
+    return math.floor(min_damage), math.floor(max_damage)
 
 
 def type_effectiveness(move_type, pokemon_types):
@@ -62,6 +64,6 @@ def type_effectiveness(move_type, pokemon_types):
 
     damage = 1
     for pokemon_type in pokemon_types:
-        damage *= type_chart[move_type][pokemon_type]
+        damage *= type_chart[move_type['name']][pokemon_type['type']['name']]
     f.close()
     return damage
